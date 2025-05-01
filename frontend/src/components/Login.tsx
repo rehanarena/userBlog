@@ -13,7 +13,7 @@ const Login = () => {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const backendurl              = import.meta.env.VITE_BACKEND_URL as string;
+  const backendurl = import.meta.env.VITE_BACKEND_URL as string;
 
   // 1) Consume and guard the context
   const ctx = useContext(UserContext);
@@ -32,8 +32,6 @@ const Login = () => {
         { email, password },
         { withCredentials: true }
       );
-
-      // 3) Use data.success and data.userInfo directly
       if (data.success) {
         setUserInfo(data.userInfo);
         setRedirect(true);
