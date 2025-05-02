@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Register = () => {
@@ -7,6 +8,7 @@ const Register = () => {
   const [name,setUsername] = useState('')
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
+  const navigate = useNavigate();
   const backendurl = import.meta.env.VITE_BACKEND_URL as string;
   
 
@@ -19,6 +21,8 @@ const Register = () => {
       );
       if(data.success){
         toast.success('Registered Succesfully')
+        navigate("/login")
+        
       }else{
         toast.error(data.message)
       }

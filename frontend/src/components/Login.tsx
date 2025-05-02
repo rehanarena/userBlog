@@ -10,12 +10,11 @@ interface LoginResponse {
 }
 
 const Login = () => {
-  const [email, setEmail]       = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const backendurl = import.meta.env.VITE_BACKEND_URL as string;
 
-  // 1) Consume and guard the context
   const ctx = useContext(UserContext);
   if (!ctx) {
     throw new Error("Login must be used within UserContextProvider");
@@ -26,7 +25,6 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      // 2) Tell Axios what shape to expect
       const { data } = await axios.post<LoginResponse>(
         `${backendurl}/api/auth/login`,
         { email, password },
@@ -69,7 +67,7 @@ const Login = () => {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
@@ -77,7 +75,7 @@ const Login = () => {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />

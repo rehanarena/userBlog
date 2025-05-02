@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.1.4",
     "@tiptap/react": "^2.11.9",
     "@tiptap/starter-kit": "^2.11.9",
+    "date-fns": "^4.1.0",
     "quill": "^2.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
