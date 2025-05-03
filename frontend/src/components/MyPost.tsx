@@ -20,11 +20,14 @@ const MyPosts: React.FC = () => {
   const [summary, setSummary] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
-  const backendurl = import.meta.env.VITE_BACKEND_URL as string;
+  const backendUrl =
+  import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+    ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+    : import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     axios
-      .get<Post[]>(`${backendurl}/api/user/myposts`, { withCredentials: true })
+      .get<Post[]>(`${backendUrl}/api/user/myposts`, { withCredentials: true })
       .then(({ data }: AxiosResponse<Post[]>) => setPosts(data))
       .catch((err: AxiosError | unknown) => {
         console.error("Fetch posts error", err);
@@ -33,7 +36,7 @@ const MyPosts: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${backendurl}/api/user/post/${id}`, {
+      await axios.delete(`${backendUrl}/api/user/post/${id}`, {
         withCredentials: true,
       });
       setPosts((prev) => prev.filter((p) => p._id !== id));
@@ -66,7 +69,7 @@ const MyPosts: React.FC = () => {
     if (file) formData.append("file", file);
 
     try {
-      const res = await axios.put<Post>(`${backendurl}/api/user/post/${editPost._id}`, formData, {
+      const res = await axios.put<Post>(`${backendUrl}/api/user/post/${editPost._id}`, formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",

@@ -6,23 +6,26 @@ import { UserContext, User } from "../userContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const backendurl = import.meta.env.VITE_BACKEND_URL as string;
+  const backendUrl =
+  import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+    ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+    : import.meta.env.VITE_BACKEND_URL;
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
     axios
-      .get<User>(`${backendurl}/api/auth/profile`, { withCredentials: true })
+      .get<User>(`${backendUrl}/api/auth/profile`, { withCredentials: true })
       .then(({ data }: AxiosResponse<User>) => {
         setUserInfo(data);
       })
       .catch((err: AxiosError | unknown) => {
         console.error("Error fetching profile:", err);
       });
-  }, [backendurl, setUserInfo]);
+  }, [backendUrl, setUserInfo]);
 
   const logout = async () => {
     await axios.post(
-      `${backendurl}/api/auth/logout`,
+      `${backendUrl}/api/auth/logout`,
       {},                  
       { withCredentials: true }
     );

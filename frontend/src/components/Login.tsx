@@ -13,7 +13,10 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
-  const backendurl = import.meta.env.VITE_BACKEND_URL as string;
+  const backendUrl =
+  import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+    ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+    : import.meta.env.VITE_BACKEND_URL;
 
   const ctx = useContext(UserContext);
   if (!ctx) {
@@ -26,7 +29,7 @@ const Login = () => {
 
     try {
       const { data } = await axios.post<LoginResponse>(
-        `${backendurl}/api/auth/login`,
+        `${backendUrl}/api/auth/login`,
         { email, password },
         { withCredentials: true }
       );

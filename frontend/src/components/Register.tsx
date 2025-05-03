@@ -9,14 +9,17 @@ const Register = () => {
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
   const navigate = useNavigate();
-  const backendurl = import.meta.env.VITE_BACKEND_URL as string;
+  const backendUrl =
+  import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+    ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+    : import.meta.env.VITE_BACKEND_URL;
   
 
   const onSubmitHandler = async (event: FormEvent) => {
     event.preventDefault();
     try {
       const { data } = await axios.post(
-        `${backendurl}/api/auth/register`,
+        `${backendUrl}/api/auth/register`,
         { name,email, password }
       );
       if(data.success){

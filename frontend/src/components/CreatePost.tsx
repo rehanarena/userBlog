@@ -12,7 +12,11 @@ const CreatePost: React.FC = () => {
   const [files, setFiles] = useState<FileList | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileName, setFileName] = useState("");
-  const backendUrl = import.meta.env.VITE_BACKEND_URL as string;
+  
+  const backendUrl =
+    import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+      ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+      : import.meta.env.VITE_BACKEND_URL;
 
   const editor = useEditor({
     extensions: [StarterKit],

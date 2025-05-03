@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PostInfo } from "../interface/post";
 
-const backendurl = import.meta.env.VITE_BACKEND_URL as string;
+const backendUrl =
+import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+  ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+  : import.meta.env.VITE_BACKEND_URL;
 
 const PostPage = () => {
   const [postInfo, setPostInfo] = useState<PostInfo | null>(null);
@@ -12,7 +15,7 @@ const PostPage = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get<PostInfo>(`${backendurl}/api/user/post/${id}`)
+        .get<PostInfo>(`${backendUrl}/api/user/post/${id}`)
         .then(({ data }: AxiosResponse<PostInfo>) => {
           setPostInfo(data);
         })
@@ -30,7 +33,7 @@ const PostPage = () => {
       {/* Cover Image */}
       <div className="w-full max-h-80 overflow-hidden mb-6 rounded-md">
         <img
-          src={`${backendurl}/${postInfo.cover.replace(/\\/g, "/")}`}
+          src={`${backendUrl}/${postInfo.cover.replace(/\\/g, "/")}`}
           alt="Post Cover"
           className="w-full h-full object-cover object-center"
         />

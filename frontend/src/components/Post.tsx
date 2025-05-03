@@ -2,7 +2,10 @@ import { format } from "date-fns";
 import { PostProps } from "../interface/post";
 import { Link } from "react-router-dom";
 
-const backendurl = import.meta.env.VITE_BACKEND_URL as string;
+const backendUrl =
+import.meta.env.VITE_NODE_ENV === "PRODUCTION"
+  ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+  : import.meta.env.VITE_BACKEND_URL;
 
 const Post: React.FC<PostProps> = ({
   _id,
@@ -19,7 +22,7 @@ const Post: React.FC<PostProps> = ({
       <div className="relative">
         <Link to={`/post/${_id}`}>
           <img
-            src={`${backendurl}/${normalizedCover}`}
+            src={`${backendUrl}/${normalizedCover}`}
             alt="Post Cover"
             className="w-full h-64 object-cover transition-transform duration-500 hover:scale-105"
           />
