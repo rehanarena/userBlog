@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 const allowedOrigins = ["https://userblog-three.vercel.app"];
-app.use(
+app.use('*',
   cors({
     origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
