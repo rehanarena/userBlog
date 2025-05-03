@@ -20,16 +20,23 @@ dotenv_1.default.config();
 //middlewares
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-const allowedOrigins = [
-    'https://user-blog-three.vercel.app/',
-];
+const allowedOrigins = ["https://userblog-three.vercel.app"];
 app.use((0, cors_1.default)({
     origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+        "token",
+    ],
     credentials: true,
 }));
 //api endpoint
-app.get('/api', (req, res) => {
-    res.send('Api Working');
+app.get("/api", (req, res) => {
+    res.send("Api Working");
 });
 const uploadDir = path_1.default.join(__dirname, "../uploads");
 if (!fs_1.default.existsSync(uploadDir)) {
@@ -39,4 +46,4 @@ app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../
 //Routes
 app.use("/api/auth", authRoute_1.default);
 app.use("/api/user", userRoute_1.default);
-app.listen(port, () => console.log('Server Started', port));
+app.listen(port, () => console.log("Server Started", port));
