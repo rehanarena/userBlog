@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PostInfo } from "../interface/post";
@@ -12,11 +12,11 @@ const PostPage = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`${backendurl}/api/user/post/${id}`)
-        .then((response) => {
-          setPostInfo(response.data);
+        .get<PostInfo>(`${backendurl}/api/user/post/${id}`)
+        .then(({ data }: AxiosResponse<PostInfo>) => {
+          setPostInfo(data);
         })
-        .catch((error) => {
+        .catch((error: AxiosError | unknown) => {
           console.error("Error fetching post:", error);
         });
     }

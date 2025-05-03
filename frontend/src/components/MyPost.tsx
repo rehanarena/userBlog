@@ -1,5 +1,6 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
+import type { AxiosResponse, AxiosError } from "axios";
 
 interface Post {
   _id: string;
@@ -23,11 +24,11 @@ const MyPosts: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get<Post[]>(`${backendurl}/api/user/myposts`, {
-        withCredentials: true,
-      })
-      .then((res) => setPosts(res.data))
-      .catch((err) => console.error("Fetch posts error", err));
+      .get<Post[]>(`${backendurl}/api/user/myposts`, { withCredentials: true })
+      .then(({ data }: AxiosResponse<Post[]>) => setPosts(data))
+      .catch((err: AxiosError | unknown) => {
+        console.error("Fetch posts error", err);
+      });
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -76,7 +77,7 @@ const MyPosts: React.FC = () => {
       );
       setEditPost(null);
       setFile(null);
-    } catch (err) {
+    } catch (err:unknown) {
       console.error("Update error", err);
     }
   };

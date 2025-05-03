@@ -36,19 +36,22 @@ const Login = () => {
       } else {
         toast.error("Wrong credentials");
       }
-    } catch (err: unknown) {
+    }  catch (err: unknown) {
+      let message = "An unexpected error occurred";
+    
       if (axios.isAxiosError(err)) {
-        const msg =
-          err.response?.data?.error ??
+        message =
+          (err.response?.data as { error?: string })?.error ??
           err.message ??
-          "Login failed with network error";
-        toast.error(msg);
+          message;
       } else if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("An unexpected error occurred");
+        message = err.message;
       }
+    
+      toast.error(message);
     }
+    
+    
   };
 
   if (redirect) {
