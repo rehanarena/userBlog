@@ -19,9 +19,14 @@ connectDB();
 //middlewares
 app.use(express.json())
 app.use(cookieParser());
+
+const allowedOrigins = [
+  'https://mini-store.shop', 
+  'http://localhost:5173',            
+];
 app.use(
     cors({
-      origin: "http://localhost:5173",  
+      origin: allowedOrigins,  
       credentials: true,                
     })
   );
