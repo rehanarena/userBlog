@@ -21,8 +21,7 @@ app.use(express.json())
 app.use(cookieParser());
 
 const allowedOrigins = [
-  'https://mini-store.shop', 
-  'http://localhost:5173',            
+  'https://user-blog-three.vercel.app/',            
 ];
 app.use(
     cors({

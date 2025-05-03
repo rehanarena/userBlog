@@ -21,8 +21,7 @@ dotenv_1.default.config();
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 const allowedOrigins = [
-    'https://mini-store.shop',
-    'http://localhost:5173',
+    'https://user-blog-three.vercel.app/',
 ];
 app.use((0, cors_1.default)({
     origin: allowedOrigins,
