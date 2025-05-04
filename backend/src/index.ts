@@ -29,16 +29,8 @@ const allowedOrigins = [
 ];
 
 app.use(
-  cors({
-    origin: (incomingOrigin, callback) => {
-      if (!incomingOrigin || allowedOrigins.includes(incomingOrigin)) {
-        return callback(null, true);
-      }
-      callback(new Error(`Origin ${incomingOrigin} not allowed by CORS`));
-    },
-    credentials: true,
-    methods:['POST','GET','PUT','OPTIONS','DELETE']
-  })
+  cors(
+    )
 );
 
 
