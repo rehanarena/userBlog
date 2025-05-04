@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import validator from "validator";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { authUser, AuthRequest } from "../middlewares/authUser";
 import User from "../models/userModel";
 
 
@@ -83,16 +84,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     });
   }
   
-  export const ProfileUser = async (req: Request, res: Response): Promise<void> => {
-    const { token } = req.cookies;
-  
-    jwt.verify(token, process.env.JWT_SECRET as string, {}, (err, info) => {
-      if (err) {
-        return res.status(401).json({ error: "Invalid or expired token" });
-      }
-      return res.json(info);
-    });
-  };
+  export const ProfileUser = async (req: AuthRequest, res: Response): Promise<void> => {
+    res.json(req.user);
+    return 
+  }
   
 
   export const logoutUser = (req: Request, res: Response) => {
