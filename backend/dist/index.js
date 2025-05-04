@@ -24,7 +24,14 @@ app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
     origin: ["http://localhost:5173", "https://user-blog-three.vercel.app"],
     credentials: true,
-    methods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS']
+    methods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+    ],
 }));
 //api endpoint
 app.get("/api", (req, res) => {
