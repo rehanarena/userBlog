@@ -83,19 +83,25 @@ export const loginUser = async (
     { expiresIn: "7d" },
   );
 
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = process.env.NODE_ENV === "PRODUCTION";
 
   // Set the cookie
   res
     .cookie("token", token, {
-      httpOnly: true,                     // inaccessible to JS
-      secure: isProd,                     // send only over HTTPS in prod
-      sameSite: isProd ? "none" : "lax",  // allow cross‑site in prod (for e.g. your frontend domain)
-      path: "/",                          // send on all routes
-      maxAge: 7 * 24 * 60 * 60 * 1000,    // cookie expiry = 7 days
+      httpOnly: true,                     
+      secure: isProd,                     
+      sameSite: isProd ? "none" : "lax",  
+      path: "/",                          
+      maxAge: 7 * 24 * 60 * 60 * 1000,    
     })
-    .status(200)
-    .json({ success: true, id: userDoc._id, email });
+    res.status(200).json({
+      success: true,
+      userInfo: {
+        id: userDoc._id,
+        email,
+      },
+    });    
+    
 };
 
 
@@ -110,9 +116,10 @@ export const loginUser = async (
   export const logoutUser = (req: Request, res: Response) => {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'development',
-      sameSite: 'lax',
-      path: '/',      
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: '/',
     });
+    
     res.status(200).json({ message: 'Logged out successfully' });
   };
