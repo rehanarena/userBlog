@@ -25,5 +25,7 @@ A simple, secure blog platform where users can sign up, log in, and manage posts
 # Setup
 
 git clone https://github.com/your-username/blog-platform.git
+
 cd blog-platform
+
 npm install
