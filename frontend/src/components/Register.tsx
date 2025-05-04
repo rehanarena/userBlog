@@ -9,9 +9,12 @@ const Register = () => {
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
   const navigate = useNavigate();
-  const backendUrl =
-  'https://user-blog-three.vercel.app';
   
+  const backendUrl =
+  import.meta.env.VITE_NODE_ENV === 'PRODUCTION'
+    ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+    : import.meta.env.VITE_BACKEND_URL;
+
 
   const onSubmitHandler = async (event: FormEvent) => {
     event.preventDefault();
