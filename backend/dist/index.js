@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+require("dotenv/config");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const mongodb_1 = __importDefault(require("./config/mongodb"));
 const authRoute_1 = __importDefault(require("./routes/authRoute"));
@@ -20,23 +21,16 @@ dotenv_1.default.config();
 //middlewares
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-const allowedOrigins = ["https://userblog-three.vercel.app"];
-app.use((0, cors_1.default)({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "X-Requested-With",
-        "Accept",
-        "Origin",
-        "token",
-    ],
-    credentials: true,
-}));
+const isProd = process.env.NODE_ENV === 'PRODUCTION';
+const allowedOrigins = [
+    isProd
+        ? process.env.PROD_CLIENT_LINK
+        : process.env.DEV_CLIENT_LINK,
+];
+app.use((0, cors_1.default)());
 //api endpoint
-app.get("/api", (req, res) => {
-    res.send("Api Working");
+app.get('/api', (req, res) => {
+    res.send('Api Working');
 });
 const uploadDir = path_1.default.join(__dirname, "../uploads");
 if (!fs_1.default.existsSync(uploadDir)) {
@@ -46,4 +40,4 @@ app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../
 //Routes
 app.use("/api/auth", authRoute_1.default);
 app.use("/api/user", userRoute_1.default);
-app.listen(port, () => console.log("Server Started", port));
+app.listen(port, () => console.log('Server Started', port));
