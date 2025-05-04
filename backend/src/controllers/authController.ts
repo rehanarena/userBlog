@@ -58,31 +58,44 @@ export const registerUser = async (
   }
 };
 
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const {email, password } = req.body;
-  const userDoc = await User.findOne({email});
+export const loginUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, password } = req.body;
+  const userDoc = await User.findOne({ email });
   if (!userDoc) {
     res.status(404).json({ error: "Invalid email or password." });
-    return
- }
+    return;
+  }
 
   const isMatch = await bcryptjs.compare(password, userDoc.password);
   if (!isMatch) {
     res.status(401).json({ error: "Invalid email or password." });
-    return
+    return;
   }
-    jwt.sign({email,id:userDoc._id},process.env.JWT_SECRET as string,{},(err,token)=>{
-      if(err) throw err;
+
+  const isProd = process.env.NODE_ENV === "production";
+
+  jwt.sign(
+    { id: userDoc._id, email },
+    process.env.JWT_SECRET as string,
+    {},
+    (err, token) => {
+      if (err) throw err;
       res
-  .cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-  })
-  .status(200)
-  .json({ success: true , id:userDoc._id,email});
-    });
-  }
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: isProd,                    
+          sameSite: isProd ? "none" : "lax", 
+          path: "/",                         
+        })
+        .status(200)
+        .json({ success: true, id: userDoc._id, email });
+    }
+  );
+};
+
   
   export const ProfileUser = async (req: AuthRequest, res: Response): Promise<void> => {
     res.json(req.user);
