@@ -1,8 +1,8 @@
-#Blog Management Platform
+# Blog Management Platform
 
 A simple, secure blog platform where users can sign up, log in, and manage posts with image uploads.
 
-#Features
+# Features
 
 1.User registration & login (JWT)
 
@@ -12,7 +12,7 @@ A simple, secure blog platform where users can sign up, log in, and manage posts
 
 4.MongoDB for storing users and posts
 
-#Tech Stack
+# Tech Stack
 
 1.Node.js & Express
 
@@ -22,7 +22,7 @@ A simple, secure blog platform where users can sign up, log in, and manage posts
 
 4.File Uploads: Multer
 
-#Setup
+# Setup
 
 git clone https://github.com/your-username/blog-platform.git
 cd blog-platform
