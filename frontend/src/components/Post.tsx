@@ -3,9 +3,9 @@ import { PostProps } from "../interface/post";
 import { Link } from "react-router-dom";
 
 const backendUrl =
-import.meta.env.VITE_NODE_ENV === "PRODUCTION"
-  ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
-  : import.meta.env.VITE_BACKEND_URL;
+  import.meta.env.VITE_NODE_ENV === 'PRODUCTION'
+    ? import.meta.env.VITE_PRODUCTION_URL_BACKEND
+    : import.meta.env.VITE_BACKEND_URL;
 
 const Post: React.FC<PostProps> = ({
   _id,

@@ -6,6 +6,7 @@ export interface IPost extends Document {
   content: string;
   cover: string;
   author: Types.ObjectId; 
+  published: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -17,6 +18,7 @@ const postSchema = new Schema<IPost>(
     content: { type: String, required: true },
     cover: { type: String },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+     published: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

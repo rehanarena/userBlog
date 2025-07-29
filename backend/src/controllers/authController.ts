@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import validator from "validator";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { authUser, AuthRequest } from "../middlewares/authUser";
+import { AuthRequest } from "../middlewares/authUser";
 import User from "../models/userModel";
 
 
@@ -76,7 +76,6 @@ export const loginUser = async (
     return 
   }
 
-  // Sign a token that expires in, say, 7 days:
   const token = jwt.sign(
     { id: userDoc._id, email },
     process.env.JWT_SECRET as string,
@@ -85,7 +84,6 @@ export const loginUser = async (
 
   const isProd = process.env.NODE_ENV === "PRODUCTION";
 
-  // Set the cookie
   res
     .cookie("token", token, {
       httpOnly: true,                     

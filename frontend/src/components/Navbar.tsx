@@ -1,5 +1,4 @@
 import axios from "axios";
-import type { AxiosResponse, AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext, User } from "../userContext";
@@ -16,13 +15,10 @@ const Navbar = () => {
   useEffect(() => {
     axios
       .get<User>(`${backendUrl}/api/auth/profile`, { withCredentials: true })
-      .then(({ data }: AxiosResponse<User>) => {
-        setUserInfo(data);
-      })
-      .catch((err: AxiosError | unknown) => {
-        console.error("Error fetching profile:", err);
-      });
+      .then(({ data }) => setUserInfo(data))
+      .catch(err => console.error("Error fetching profile:", err));
   }, [backendUrl, setUserInfo]);
+  
 
   const logout = async () => {
     await axios.post(

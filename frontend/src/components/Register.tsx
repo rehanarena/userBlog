@@ -9,7 +9,7 @@ const Register = () => {
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
   const navigate = useNavigate();
-  
+
   const backendUrl =
   import.meta.env.VITE_NODE_ENV === 'PRODUCTION'
     ? import.meta.env.VITE_PRODUCTION_URL_BACKEND

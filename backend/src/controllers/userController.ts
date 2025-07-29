@@ -1,148 +1,150 @@
-// src/controllers/userController.ts
-import { Request, Response,RequestHandler } from "express";
+import { Request, Response, RequestHandler } from "express";
 import fs from "fs";
-import jwt from "jsonwebtoken";
-import path from 'path';
+import path from "path";
 import Post from "../models/postModel";
+import { AuthRequest } from "../middlewares/authUser";
 
-export const createPost = async (req: Request, res: Response): Promise<void> => {
-  if (!req.file) {
-    res.status(400).json({ error: "No file uploaded" });
-    return;
-  }
-
-  const { originalname, path: tempPath } = req.file;
-  const ext = originalname.split(".").pop();
-  const newPath = `${tempPath}.${ext}`;
-  fs.renameSync(tempPath, newPath);
-
-  const token = req.cookies.token;
-  let payload: { id: string };
+export const createPost = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   try {
-    payload = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as { id: string };
-  } catch (err) {
-    res.status(401).json({ error: "Invalid or expired token" });
-    return;
-  }
+    let coverPath = "";
+    if (req.file) {
+      const { originalname, path: tempPath } = req.file;
+      const ext = originalname.split(".").pop();
+      const newPath = `${tempPath}.${ext}`;
+      fs.renameSync(tempPath, newPath);
+      coverPath = newPath;
+    }
 
-  const { title, summary, content } = req.body;
-  try {
-    const postDoc = await Post.create({
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const { title, summary, content } = req.body;
+    if (!title || !summary || !content) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+
+    const newPost = await Post.create({
       title,
       summary,
       content,
-      cover: newPath,
-      author: payload.id,
+      cover: coverPath,
+      author: userId,
+      published: false,
     });
-    res.json({
-      success: true,
-      postDoc,
-    });
+
+    res.status(201).json({ success: true, post: newPost });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to create post" });
+    console.error("Error creating post:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-export const getPost = async (
+export const uploadImage = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const posts = await Post.find()
-    .populate("author", ["name"])
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: "No image uploaded" });
+      return;
+    }
+
+    const { filename } = req.file;
+    const fileUrl = `/uploads/${filename}`;
+
+    res.status(200).json({ url: fileUrl });
+    return;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ error: "Image upload failed" });
+  }
+};
+
+export const getPost = async (req: Request, res: Response): Promise<void> => {
+  const posts = await Post.find({ published: true })
+    .populate("author", "name")
     .sort({ createdAt: -1 })
     .limit(20);
+
   res.json(posts);
 };
 
-export const postDetail = async(req: Request, res: Response):Promise<void> => {
-  const {id} = req.params
-  const postDoc = await Post.findById(id).populate('author',['name'])
+export const postDetail = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const postDoc = await Post.findById(id).populate("author", ["name"]);
   res.json(postDoc);
-}
+};
 
-export const getMyPosts = async (req: Request, res: Response): Promise<void> => {
-  // 1. grab the token from cookies
-  const token = req.cookies?.token;
-  if (!token) {
-    res.status(401).json({ error: 'Not authenticated: no token' });
+export const getMyPosts = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 
-  // 2. verify & extract payload
-  let payload: { id: string; email?: string };
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: string;
-      email?: string;
-    };
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid or expired token' });
-    return;
-  }
-
-  // 3. use payload.id as the author filter
-  try {
-    const posts = await Post.find({ author: payload.id }).sort({
-      createdAt: -1,
-    });
+    const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to fetch posts' });
+    res.status(500).json({ error: "Failed to fetch posts" });
   }
 };
 
+export const publishPost = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const post = await Post.findByIdAndUpdate(
+    id,
+    { published: true },
+    { new: true }
+  );
+  res.json(post);
+};
 
 export const updatePost = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ): Promise<void> => {
   const { title, summary, content } = req.body;
   const { id } = req.params;
 
-  // 1) grab token from cookie
-  const token = req.cookies?.token;
-  if (!token) {
-    res.status(401).json({ error: 'Not authenticated: no token' });
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 
-  // 2) verify & extract user ID
-  let payload: { id: string; email?: string };
-  try {
-    payload = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: string;
-      email?: string;
-    };
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid or expired token' });
-    return;
-  }
-
-  // 3) basic field check
   if (!title || !summary || !content) {
-    res.status(400).json({ error: 'All fields are required' });
+    res.status(400).json({ error: "All fields are required" });
     return;
   }
 
   try {
-    // 4) find the post, ensuring author matches
-    const post = await Post.findOne({ _id: id, author: payload.id });
+    const post = await Post.findOne({ _id: id, author: userId });
     if (!post) {
-      res.status(404).json({ error: 'Post not found or not yours' });
+      res.status(404).json({ error: "Post not found or not yours" });
       return;
     }
-
-    // 5) apply updates
-    post.title   = title;
+    post.title = title;
     post.summary = summary;
     post.content = content;
 
-    // 6) handle new file upload & rename it as you did in createPost
     if (req.file) {
       const { originalname, path: tmpPath } = req.file;
       const ext = path.extname(originalname);
@@ -150,52 +152,45 @@ export const updatePost = async (
       fs.renameSync(tmpPath, newPath);
       post.cover = newPath;
     }
-
-    // 7) save & respond
     await post.save();
     res.json(post);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to update post' });
+    res.status(500).json({ error: "Failed to update post" });
   }
 };
 
-export const deletePost: RequestHandler = async (req, res): Promise<void> => {
-  // 1) Grab the token from cookies
+export const deletePost: RequestHandler = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   const token = req.cookies?.token;
   if (!token) {
-    res.status(401).json({ error: 'Not authenticated: no token' });
+    res.status(401).json({ error: "Not authenticated: no token" });
     return;
   }
 
-  // 2) Verify & extract user ID
-  let payload: { id: string; email?: string };
-  try {
-    payload = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: string;
-      email?: string;
-    };
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid or expired token' });
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 
-  // 3) Attempt deletion, filtering by that user ID
   try {
     const post = await Post.findOneAndDelete({
       _id: req.params.id,
-      author: payload.id,
+      author: userId,
     });
     if (!post) {
-      res.status(404).json({ error: 'Post not found or not yours' });
+      res.status(404).json({ error: "Post not found or not yours" });
       return;
     }
 
-    res.json({ message: 'Post deleted successfully' });
+    res.json({ message: "Post deleted successfully" });
     return;
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to delete post' });
+    res.status(500).json({ error: "Failed to delete post" });
     return;
   }
 };
